@@ -21,9 +21,15 @@ const Layout = () => {
                     </Navbar>
                 </Card.Header>
                 <Card.Body>
-                <Outlet></Outlet>
+                    <Outlet></Outlet>
 
                 </Card.Body>
+                <Card.Footer>
+                    
+                    <Card.Text>
+                    © 2022 | Derechos Reservados Brayan David Aguinsaca
+                    </Card.Text>
+                </Card.Footer>
             </Card>
 
         </>

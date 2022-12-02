@@ -106,6 +106,9 @@ const Marca = () => {
 
     const createOrUpdate = (event) => {
 
+        event.preventDefault();
+        console.log('validacion');
+
         if (!esEditar) {
             //crear
             axios.post(baseURL + 'Marca', formValue)
@@ -119,6 +122,14 @@ const Marca = () => {
                     })
                     setData([...data, response.data]);
                     handleClose();
+                }).catch((error) => {
+                    console.log(error.response.data.title);
+                    let message = error.response.data.title;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: message,
+                    })
                 });
 
         } else {
@@ -148,7 +159,17 @@ const Marca = () => {
 
                 console.log(data)
 
-            }).catch((error) => setError(error));
+            }).catch((error) => {
+                console.log(error.response.data.detail);
+                let message = error.response.data.detail.toString();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: message,
+                })
+
+                //setError(error);
+            });
         }
 
     }
@@ -175,12 +196,12 @@ const Marca = () => {
                 </Row>
             </Container>
 
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Llenar el formulario</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
+            <Modal show={show} onHide={handleClose} onSubmit={createOrUpdate}>
+                <Form >
+                    <Modal.Header closeButton>
+                        <Modal.Title>Llenar el formulario</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
                         <Form.Group className="mb-3" controlId="formIdentificador">
                             <Form.Label>Identificador</Form.Label>
                             <Form.Control type="text"
@@ -192,8 +213,7 @@ const Marca = () => {
                                 onChange={handleChange}
                                 placeholder="Identificador" />
                         </Form.Group>
-                    </Form>
-                    <Form>
+
                         <Form.Group className="mb-3" controlId="formMarca">
                             <Form.Label>Nombre de la Marca</Form.Label>
                             <Form.Control type="text"
@@ -204,21 +224,21 @@ const Marca = () => {
                                 onChange={handleChange}
                                 placeholder="Marca" />
                         </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    {/* <Button variant="primary" onClick={crearMarca}>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}>
+                            Close
+                        </Button>
+                        {/* <Button variant="primary" onClick={crearMarca}>
                         Crear
                     </Button> */}
+                        <Button variant="primary" type="submit">
+                            {esEditar ? 'Editar' : 'Crear'}
+                        </Button>
+                    </Modal.Footer>
 
-                    <Button variant="primary" /* type="submit" */ onClick={createOrUpdate}>
-                        {esEditar ? 'Editar' : 'Crear'}
-                    </Button>
+                </Form>
 
-                </Modal.Footer>
             </Modal>
 
         </>

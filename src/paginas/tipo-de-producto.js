@@ -104,6 +104,8 @@ const TipoDeProducto = () => {
 
     const createOrUpdate = (event) => {
 
+        event.preventDefault();
+
         if (!esEditar) {
             //crear
             axios.post(baseURL + 'TipoProducto', formValue)
@@ -117,6 +119,14 @@ const TipoDeProducto = () => {
                     })
                     setData([...data, response.data]);
                     handleClose();
+                }).catch((error) => {
+                    console.log(error.response.data.title);
+                    let message = error.response.data.title;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: message,
+                    })
                 });
 
         } else {
@@ -146,7 +156,17 @@ const TipoDeProducto = () => {
 
                 console.log(data)
 
-            }).catch((error) => setError(error));
+            }).catch((error) => {
+
+                console.log(error.response.data.detail);
+                let message = error.response.data.detail.toString();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: message,
+                })
+                
+            });
         }
 
     }
@@ -171,12 +191,13 @@ const TipoDeProducto = () => {
             </Row>
         </Container>
 
-        <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Llenar el formulario</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form>
+        <Modal show={show} onHide={handleClose} onSubmit={createOrUpdate}>
+            <Form>
+                <Modal.Header closeButton>
+                    <Modal.Title>Llenar el formulario</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+
                     <Form.Group className="mb-3" controlId="formIdentificador">
                         <Form.Label>Identificador</Form.Label>
                         <Form.Control type="text"
@@ -188,8 +209,6 @@ const TipoDeProducto = () => {
                             onChange={handleChange}
                             placeholder="Identificador" />
                     </Form.Group>
-                </Form>
-                <Form>
                     <Form.Group className="mb-3" controlId="formMarca">
                         <Form.Label>Nombre del tipo de producto</Form.Label>
                         <Form.Control type="text"
@@ -200,18 +219,19 @@ const TipoDeProducto = () => {
                             onChange={handleChange}
                             placeholder="Tipo de producto" />
                     </Form.Group>
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
 
-                <Button variant="primary" /* type="submit" */ onClick={createOrUpdate}>
-                    {esEditar ? 'Editar' : 'Crear'}
-                </Button>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
 
-            </Modal.Footer>
+                    <Button variant="primary" type="submit" /* onClick={createOrUpdate} */>
+                        {esEditar ? 'Editar' : 'Crear'}
+                    </Button>
+
+                </Modal.Footer>
+            </Form>
         </Modal>
     </>);
 }

@@ -35,8 +35,8 @@ const Producto = () => {
         observaciones: "",
         //caducidad: new Date(),
         caducidad: format(new Date(), 'yyyy-MM-dd'),
-        marcaId: "",
-        tipoProductoId: ""
+        marcaId: '',
+        tipoProductoId: ''
     }
     const [formValue, setFormValue] = useState(inputFormulario);
 
@@ -140,8 +140,13 @@ const Producto = () => {
 
     const createOrUpdate = (event) => {
 
+        event.preventDefault();
+
         if (!esEditar) {
             //crear
+
+            console.log(formValue.marcaId);
+
             axios.post(baseURL + 'Producto', formValue)
                 .then((response) => {
                     Swal.fire({
@@ -151,10 +156,17 @@ const Producto = () => {
                         showConfirmButton: false,
                         timer: 1500
                     })
-
                     console.log(response.data);
                     setData([...data, response.data]);
                     handleClose();
+                }).catch((error) => {
+                    console.log(error.response.data.title);
+                    let message = error.response.data.title;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: message,
+                    })
                 });
 
         } else {
@@ -189,7 +201,15 @@ const Producto = () => {
 
                 console.log(data)
 
-            }).catch((error) => setError(error));
+            }).catch((error) => {
+                console.log(error.response.data.detail);
+                let message = error.response.data.detail.toString();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: message,
+                })
+            });
         }
 
     }
@@ -216,17 +236,18 @@ const Producto = () => {
             </Row>
         </Container>
 
-        <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-                <Modal.Title>Llenar el formulario</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
+        <Modal show={show} onHide={handleClose} className="me-2" onSubmit={createOrUpdate}>
+            <Form>
+                <Modal.Header closeButton>
+                    <Modal.Title>Llenar el formulario</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
 
-                <Container>
+                    <Container>
 
-                    <Row>
-                        <Col xs={6} md={4}>
-                            <Form>
+                        <Row>
+                            <Col xs={6} md={4}>
+
                                 <Form.Group className="mb-3" controlId="formMarca">
                                     <Form.Label>Nombre</Form.Label>
                                     <Form.Control type="text"
@@ -237,14 +258,15 @@ const Producto = () => {
                                         onChange={handleChange}
                                         placeholder="Tipo de producto" />
                                 </Form.Group>
-                            </Form>
-                        </Col>
-                        <Col xs={6} md={4}>
-                            <Form>
+
+                            </Col>
+                            <Col xs={6} md={4}>
+
                                 <Form.Group className="mb-3" controlId="formMarca">
                                     <Form.Label>Precio</Form.Label>
                                     <Form.Control type="number"
                                         step=".01"
+                                        min="0"
                                         required
                                         className="precio"
                                         name="precio"
@@ -252,13 +274,14 @@ const Producto = () => {
                                         onChange={handleChange}
                                         placeholder="Tipo de producto" />
                                 </Form.Group>
-                            </Form>
-                        </Col>
-                        <Col xs={6} md={4}>
-                            <Form>
+
+                            </Col>
+                            <Col xs={6} md={4}>
+
                                 <Form.Group className="mb-3" controlId="formMarca">
                                     <Form.Label>Caducidad</Form.Label>
                                     <Form.Control
+                                        required
                                         type="date"
                                         className='caducidad'
                                         name="caducidad"
@@ -268,12 +291,12 @@ const Producto = () => {
                                     //onChange={(e) => setDate(e.target.value)}
                                     />
                                 </Form.Group>
-                            </Form>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={6} md={4}>
-                            <Form>
+
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs={6} md={4}>
+
                                 <Form.Group className="mb-3" controlId="formTipoProducto">
                                     <Form.Label>Tipo de Producto</Form.Label>
                                     <Form.Select aria-label="Default select example"
@@ -291,10 +314,10 @@ const Producto = () => {
                                         }
                                     </Form.Select>
                                 </Form.Group>
-                            </Form>
-                        </Col>
-                        <Col xs={6} md={4}>
-                            <Form>
+
+                            </Col>
+                            <Col xs={6} md={4}>
+
                                 <Form.Group className="mb-3" controlId="formMarca">
                                     <Form.Label>Marca</Form.Label>
                                     <Form.Select aria-label="Default select example"
@@ -307,17 +330,17 @@ const Producto = () => {
                                         <option>Open this select menu</option>
                                         {
                                             dataMarca.map((item) =>
-                                                <option key={item.id} value={item.id}>{item.nombre}</option>
+                                                <option key={item.id} value={item.id} >{item.nombre}</option>
                                             )
                                         }
                                     </Form.Select>
                                 </Form.Group>
-                            </Form>
-                        </Col>
-                        <Col xs={6} md={4}>
+
+                            </Col>
+                            <Col xs={6} md={4}>
 
 
-                            <Form>
+
                                 <Form.Group className="mb-3" controlId="formMarca">
                                     <Form.Label>Observacion</Form.Label>
                                     <Form.Control
@@ -331,22 +354,25 @@ const Producto = () => {
                                         style={{ height: '100px' }}
                                     />
                                 </Form.Group>
-                            </Form>
-                        </Col>
-                    </Row>
-                </Container>
 
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
+                            </Col>
+                        </Row>
+                    </Container>
 
-                <Button variant="primary" /* type="submit" */ onClick={createOrUpdate}>
-                    {esEditar ? 'Editar' : 'Crear'}
-                </Button>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
 
-            </Modal.Footer>
+                    <Button variant="primary" type="submit" /* onClick={createOrUpdate} */>
+                        {esEditar ? 'Editar' : 'Crear'}
+                    </Button>
+
+                </Modal.Footer>
+
+            </Form>
+
         </Modal>
     </>
 
